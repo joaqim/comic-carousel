@@ -1,0 +1,113 @@
+{
+  "name": "typescript-react-native-starter",
+  "version": "0.0.1",
+  "private": false,
+  "description": "A Typescript React Native boilerplate to start your project quickly",
+  "author": "Hung Dao <arthur_dao@icloud.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "start:ios": "open ./ios/*.xcworkspace && yarn start",
+    "start:android": "open -a '/Applications/Android Studio.app' ./android && yarn start",
+    "test": "jest --verbose --coverage",
+    "test:update": "jest --verbose --coverage --updateSnapshot",
+    "test:watch": "jest --verbose --watch",
+    "coverage": "jest --verbose --coverage && open ./coverage/lcov-report/index.html",
+    "codecov": "jest --verbose --coverage && ./node_modules/.bin/codecov --token=176f4867-f830-40ec-a536-90e7b611d713",
+    "lint": "tslint --project tsconfig.json -q -e \"coverage/**\"",
+    "rename": "react-native-rename",
+    "jetify": "npx jetify",
+    "icon": "npx app-icon generate -i publishing/icon.png",
+    "build:android": "cd android/ && ./gradlew assembleDebug && adb install app/build/outputs/apk/debug/app-debug.apk"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint",
+      "pre-push": "yarn codecov"
+    }
+  },
+  "dependencies": {
+    "@dudigital/react-native-zoomable-view": "^1.0.13",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
+    "@types/react-redux": "^7.1.0",
+    "@types/redux-persist": "^4.3.1",
+    "autobind-decorator": "^2.4.0",
+    "axios": "^0.19.0",
+    "react": "16.8.6",
+    "react-native": "0.60.4",
+    "react-native-carousel-pager": "^1.5.0",
+    "react-native-gesture-handler": "^1.3.0",
+    "react-native-localization": "^2.1.2",
+    "react-native-normalize": "^1.0.1",
+    "react-native-viewpager-carousel": "^0.3.2",
+    "react-navigation": "^3.11.1",
+    "react-redux": "^7.1.0",
+    "redux": "^4.0.1",
+    "redux-persist": "^5.10.0",
+    "redux-saga": "^1.0.5",
+    "typesafe-actions": "^4.4.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-decorators": "^7.4.4",
+    "@babel/runtime": "^7.5.5",
+    "@react-native-community/eslint-config": "^0.0.5",
+    "@types/jest": "^24.0.15",
+    "@types/react": "^16.8.23",
+    "@types/react-native": "^0.60.2",
+    "@types/react-test-renderer": "^16.8.2",
+    "app-icon": "^0.13.0",
+    "babel-jest": "^24.8.0",
+    "codecov": "^3.5.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "eslint": "^6.0.1",
+    "husky": "^2.4.1",
+    "jest": "^24.8.0",
+    "jetifier": "^1.6.3",
+    "metro-react-native-babel-preset": "^0.55.0",
+    "react-dom": "^16.8.6",
+    "react-native-rename": "^2.4.1",
+    "react-native-testing-library": "^1.9.1",
+    "react-test-renderer": "16.8.6",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.18.0",
+    "tslint-config-airbnb": "^5.11.1",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-react": "^4.0.0",
+    "typescript": "^3.5.3"
+  },
+  "jest": {
+    "preset": "react-native",
+    "transform": {
+      "^.+\\.js$": "<rootDir>/node_modules/react-native/jest/preprocessor.js",
+      "\\.(ts|tsx)$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.jest.json"
+      }
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.{js,jsx,tsx}",
+      "!**/coverage/**",
+      "!**/node_modules/**",
+      "!**/babel.config.js",
+      "!**/jest.setup.js"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!react-native|react-native-localization|react-navigation)"
+    ],
+    "setupFiles": [
+      "<rootDir>/jest-setup.js"
+    ]
+  }
+}

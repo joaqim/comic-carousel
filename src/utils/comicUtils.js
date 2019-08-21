@@ -41,7 +41,7 @@ export function getChapterArray(comic_data, hq=false) {
   })
   return chapters;
 }
-
+ 
 export function getImagesArray(pages_data, chapter_nr, chapter_name, hq=false) {
   let images = [];
   console.warn('pages_data')

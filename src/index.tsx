@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';
-import App from './App';
+import App from './App2';
 import NavigationService from './lib/NavigationService';
 import { persistor, store } from './store';
 

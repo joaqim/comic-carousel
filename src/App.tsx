@@ -140,73 +140,144 @@ class App extends Component {
     }
   }
 
-  loadImages(chapters_arr=this.state.chapters_arr, chapter_nr=this.state.chapter_nr, threshold=1) {
-    var nr;
-    for(nr = chapter_nr-threshold; nr < chapter_nr+threshold+1; nr++) {
-      let chapter_name = chapters_arr[nr]
-      console.warn(chapter_name)
-      //console.warn(encodeURI(ROOT_URL + comic_name + '/' + chapters_arr[chapter_nr] + '/' + (chapter_nr+1) + '.json'))
-      if(nr === chapter_nr) {
-      {axios.get(encodeURI(ROOT_URL + comic_name + '/' + chapter_name + '/' + 'pages.json'))
-            .then(response => {
-              let pages_data = response.data
-              let img_arr = getImagesArray(pages_data,chapter_nr=chapter_nr ,chapter_name=chapter_name)
+  async updateImages(chapter_nr, chapters_arr=this.state.chapters_arr) {
+    if(chapter_nr === this.state.chapter_nr+1) {
+      const [ req1 ]  = await Promise.all([
+        axios.get(encodeURI(ROOT_URL + comic_name + '/' + chapters_arr[chapter_nr] + '/' + 'pages.json'))
+      ]);
 
-              console.warn('img_arr')
-              console.warn(img_arr)
-              this.setState({
-                pages_data: pages_data,
-                pages_data_loaded: true,
-                img_arr: img_arr,
+      let next_img_arr = getImagesArray(req1.data, chapter_nr=chapter_nr)
+      let next_img = next_img_arr[2];
 
-                chapter_name: chapter_name,
-              })
-            })
-        }
-      } else if (nr < chapter_nr) {
-        console.assert(nr > 0) //TODO:
+      let img_arr = this.state.next_img_arr;
 
-        {axios.get(encodeURI(ROOT_URL + comic_name + '/' + chapter_name + '/' + 'pages.json'))
-            .then(response => {
-              let pages_data = response.data
-              let img_arr = getImagesArray(pages_data,chapter_nr=chapter_nr ,chapter_name=chapter_name)
-
-              this.setState(prevState => ({
-                img_arr: [img_arr[img_arr.length] ,...prevState.img_arr],
-                next_img_arr: img_arr,
-              }))
-
-              this.setState({
-                prev_img_arr: img_arr,
-              })
-            })
-
-        }
-      } else if (nr > chapter_nr) {
-        console.assert(nr < chapters_arr.length) //TODO:
-
-        {axios.get(encodeURI(ROOT_URL + comic_name + '/' + chapter_name + '/' + 'pages.json'))
-            .then(response => {
-              let pages_data = response.data
-              let img_arr = getImagesArray(pages_data,chapter_nr=chapter_nr ,chapter_name=chapter_name)
-              console.log('img_arr[0]')
-              console.log(img_arr[0])
-
-              this.setState(prevState => ({
-                img_arr: [...prevState.img_arr, img_arr[0]],
-                next_img_arr: img_arr,
-              }))
-              /*
-              this.setState({
-                next_img_arr: img_arr,
-              })
-              */
-            })
-
-        }
+      img_arr[img_arr.length-1] = {
+        source: next_img.source,
+        key: img_arr.length-1,
+        //chapter_name: chapters_arr[chapter_nr+1],
+        chapter_nr: chapter_nr+1,
       }
+
+      img_arr[0] = {
+        key: 0,
+        source: this.state.img_arr[this.state.img_arr.length].source,
+        chapter_nr: chapter_nr-1,
+      }
+
+     
+      this.setState({
+        img_arr: img_arr,
+        prev_img_arr: this.state.img_arr,
+        next_img_arr: next_img_arr,
+
+        chapter_nr: chapter_nr,
+      })
+
+      this.viewPager.scrollToIndex(1,animated=false)
+
+    } else if(chapter_nr === this.state.chapter_nr-1) {
+
+      const [ req1 ]  = await Promise.all([
+        axios.get(encodeURI(ROOT_URL + comic_name + '/' + chapters_arr[chapter_nr] + '/' + 'pages.json'))
+      ]);
+
+      
+      let prev_img_arr = getImagesArray(req1.data, chapter_nr=chapter_nr, chapter_name=chapters_arr[chapter_nr])
+      let prev_img = prev_img_arr[prev_img_arr.length-1]
+
+      let img_arr = this.state.prev_img_arr;
+      img_arr[0] = {
+        key: 0,
+        source: prev_img.source,
+        chapter_nr: chapter_nr,
+      }
+
+      let next_img = this.state.img_arr[2];
+      img_arr[img_arr.length-1] = {
+        source: next_img.source,
+        key: img_arr.length-1,
+        //chapter_name: chapters_arr[chapter_nr+1],
+        chapter_nr: chapter_nr+1,
+      }
+
+      this.setState({
+        img_arr: img_arr,
+        next_img_arr: this.state.img_arr,
+        prev_img_arr: prev_img_arr,
+
+        chapter_nr: chapter_nr,
+      })
+      this.viewPager.scrollToIndex(this.state.img_arr.length-1,animated=false)
+
+
+    } else {
+      this.loadImages(chapter_nr=chapter_nr)
     }
   }
+
+ _onPageChange = (pageNumber) => {
+    //console.warn(pageNumber)
+    if(pageNumber-1 <= 0) {
+      this.updateImages(this.state.chapter_nr-1)
+      //this.viewPager.scrollToIndex(1, animated=false);
+    } else if(pageNumber+1 >= this.state.img_arr) {
+      this.updateImages(this.state.chapter_nr+1)
+      //this.viewPager.scrollToIndex(1, animated=false);
+    } else {
+      //this.updateImages(this.state.chapter_nr-1)
+      //this.viewPager.scrollToIndex(1, animated=false);
+    }
+  }
+
+
+  async loadImages(chapters_arr=this.state.chapters_arr, chapter_nr=this.state.chapter_nr) {
+    console.warn('Load Images')
+    try {
+      const [req1, req2, req3 ] = await Promise.all([
+      axios.get(encodeURI(ROOT_URL + comic_name + '/' + chapters_arr[chapter_nr] + '/' + 'pages.json')),
+      axios.get(encodeURI(ROOT_URL + comic_name + '/' + chapters_arr[chapter_nr-1] + '/' + 'pages.json')),
+      axios.get(encodeURI(ROOT_URL + comic_name + '/' + chapters_arr[chapter_nr+1] + '/' + 'pages.json'))
+      ]);
+
+      let img_arr = getImagesArray(req1.data, chapter_nr=chapter_nr, chapter_name=chapters_arr[chapter_nr]);
+      let prev_img_arr = getImagesArray(req2.data, chapter_nr=chapter_nr, chapter_name=chapters_arr[chapter_nr-1]);
+      let next_img_arr = getImagesArray(req3.data, chapter_nr=chapter_nr, chapter_name=chapters_arr[chapter_nr+1]);
+
+      let prev_img =  prev_img_arr[prev_img_arr.length-2];
+      img_arr[0] = {
+        source: prev_img.source,
+        key: 0,
+        //chapter_name: chapters_arr[chapter_nr-1],
+        chapter_nr: chapter_nr-1,
+      }
+
+      console.warn('prev_img')
+      console.warn(prev_img)
+
+
+      let next_img =  next_img_arr[2]
+      img_arr[img_arr.length-1] = {
+        source: next_img.source,
+        key: img_arr.length-1,
+        //chapter_name: chapters_arr[chapter_nr+1],
+        chapter_nr: chapter_nr+1,
+      }
+
+
+      this.setState({
+        img_arr: img_arr,
+        prev_img_arr: prev_img_arr,
+        next_img_arr: next_img_arr,
+        chapter_name: chapters_arr[chapter_nr],
+
+        pages_data: req1.data,
+        pages_data_loaded: true,
+      })
+    } catch(err){
+      console.log(err)
+    }
+  }
+
 
   loadPages(chapters_arr=this.state.chapters_arr, chapter_nr=this.state.chapter_nr) {
     let chapter_name = chapters_arr[chapter_nr]
@@ -301,10 +372,7 @@ class App extends Component {
     return true;
   }
 
-  _onPageChange = (pageNumber) => {
-    //console.warn(pageNumber)
-  }
-  _renderPage = ({data}) => {
+   _renderPage = ({data}) => {
 
     //console.warn(encodeURI(ROOT_URL + this.state.comic_name +'/' + this.state.chapter_name + '/' + data.source))
 
@@ -333,8 +401,9 @@ class App extends Component {
 
       { data.source ? <Image
                         key={'im' + data.key}
-                        source={{uri: encodeURI(ROOT_URL + this.state.comic_name +'/' + data.chapter_name + '/' + data.source)}}
-      //source={{uri: encodeURI(ROOT_URL + this.state.comic_name +'/' + this.state.chapter_name + '/' + '007.png')}}
+                        source={{uri: encodeURI(ROOT_URL + this.state.comic_name +'/' + this.state.chapters_arr[data.chapter_nr] + '/' + data.source)}}
+                        //source={{uri: encodeURI(ROOT_URL + this.state.comic_name +'/' + data.chapter_name + '/' + data.source)}}
+                        //source={{uri: encodeURI(ROOT_URL + this.state.comic_name +'/' + this.state.chapter_name + '/' + '007.png')}}
                         style={styles.imagebackground} /> : <View style={styles.noImage}/>}
 
           </ReactNativeZoomableView>
@@ -364,7 +433,7 @@ class App extends Component {
       <View style={styles.container} >
       <ViewPager
       ref={ref => {this.viewPager = ref}}
-      firePageChangeIfPassedScreenCenter={true}
+      //firePageChangeIfPassedScreenCenter={true}
       //data={data}
       data={this.state.img_arr}
       renderPage={this._renderPage}

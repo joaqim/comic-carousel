@@ -164,7 +164,7 @@ class App extends Component {
         chapter_nr: chapter_nr-1,
       }
 
-     
+
       this.setState({
         img_arr: img_arr,
         prev_img_arr: this.state.img_arr,
@@ -181,7 +181,7 @@ class App extends Component {
         axios.get(encodeURI(ROOT_URL + comic_name + '/' + chapters_arr[chapter_nr] + '/' + 'pages.json'))
       ]);
 
-      
+
       let prev_img_arr = getImagesArray(req1.data, chapter_nr=chapter_nr, chapter_name=chapters_arr[chapter_nr])
       let prev_img = prev_img_arr[prev_img_arr.length-1]
 
@@ -368,7 +368,7 @@ class App extends Component {
       return false
     }
 
-    
+
     return true;
   }
 
@@ -382,7 +382,7 @@ class App extends Component {
       <View //style={{flex: 1}}
       style={styles.imagebackground}
       {...this._panResponder.panHandlers}>
-      
+
       <Text>{data.key}</Text>
       <ReactNativeZoomableView
       maxZoom={10.0}
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'salmon',
     borderRadius: 10,
     borderColor: 'black',
-    borderWidth: 3, 
+    borderWidth: 3,
   },
   body: {
     flex: 1,
